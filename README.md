@@ -147,7 +147,7 @@
   </section>
 
   <footer>
-    &copy; 2025 Helping Platform. All rights reserved.
+    &copy; 2025 Helping Platform. All rights reserved...
   </footer>
 
 </body>
