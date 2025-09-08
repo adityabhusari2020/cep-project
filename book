@@ -1,0 +1,164 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <limits>
+using namespace std;
+
+class Book {
+private:
+    string title;
+    string author;
+    string publisher;
+    double price;
+    int stock;
+
+public:
+    Book(const string& t, const string& a, const string& p, double pr, int s)
+        : title(t), author(a), publisher(p), price(pr), stock(s) {
+        cout << "Book created: " << title << endl;
+    }
+
+    ~Book() {
+        cout << "Book destroyed: " << title << endl;
+    }
+
+    string getTitle() const { return title; }
+    string getAuthor() const { return author; }
+    string getPublisher() const { return publisher; }
+    double getPrice() const { return price; }
+    int getStock() const { return stock; }
+    void reduceStock(int q) { stock -= q; }
+    void addStock(int q) { stock += q; }
+};
+
+class BookStore {
+private:
+    vector<Book> books;
+
+    string toLower(const string& str) const {
+        string lower = str;
+        for (auto &c : lower) c = tolower(c);
+        return lower;
+    }
+
+    void displayBookDetails(const Book& book) const {
+        cout << "Title: " << book.getTitle() << endl;
+        cout << "Author: " << book.getAuthor() << endl;
+        cout << "Publisher: " << book.getPublisher() << endl;
+        cout << "Price: " << book.getPrice() << endl;
+        cout << "Stock: " << book.getStock() << endl;
+    }
+
+public:
+    BookStore() {
+        cout << "BookStore created." << endl;
+    }
+
+    ~BookStore() {
+        cout << "BookStore destroyed." << endl;
+    }
+
+    void addBook() {
+        string title, author, publisher;
+        double price;
+        int stock;
+        cout << "Enter book title: ";
+        getline(cin, title);
+        cout << "Enter book author: ";
+        getline(cin, author);
+        cout << "Enter book publisher.: ";
+        getline(cin, publisher);
+        cout << "Enter book price: ";
+        cin >> price;
+        cout << "Enter book stock: ";
+        cin >> stock;
+
+        for (auto& book : books) {
+            if (toLower(book.getTitle()) == toLower(title)) {
+                book.addStock(stock);
+                cout << "Book already exists. Stock updated!" << endl;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                return;
+            }
+        }
+        books.emplace_back(title, author, publisher, price, stock);
+        cout << "Book added successfully!" << endl;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+
+    void searchAndDisplayBook() const {
+        string searchTitle;
+        cout << "Enter book title to search: ";
+        getline(cin, searchTitle);
+        for (const auto& book : books) {
+            if (toLower(book.getTitle()) == toLower(searchTitle)) {
+                cout << "\nBook Found:" << endl;
+                displayBookDetails(book);
+                return;
+            }
+        }
+        cout << "Book not found." << endl;
+    }
+
+    void displayAllBooks() const {
+        if (books.empty()) {
+            cout << "No books in the store." << endl;
+            return;
+        }
+        cout << "\n--- All Books ---" << endl;
+        for (const auto& book : books) {
+            displayBookDetails(book);
+            cout << "-------------------" << endl;
+        }
+    }
+
+    void buyBook() {
+        string searchTitle;
+        int quantity;
+        cout << "Enter book title to buy: ";
+        getline(cin, searchTitle);
+        cout << "Enter quantity: ";
+        cin >> quantity;
+
+        for (auto& book : books) {
+            if (toLower(book.getTitle()) == toLower(searchTitle)) {
+                if (book.getStock() >= quantity) {
+                    book.reduceStock(quantity);
+                    cout << "Purchase successful! Remaining stock: " << book.getStock() << endl;
+                } else {
+                    cout << "Insufficient stock. Available stock: " << book.getStock() << endl;
+                }
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                return;
+            }
+        }
+        cout << "Book not found." << endl;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+};
+
+int main() {
+    BookStore store;
+    int choice;
+    do {
+        cout << "\n--- Book Store Menu ---" << endl;
+        cout << "1. Add Book" << endl;
+        cout << "2. Search and Display Book" << endl;
+        cout << "3. Display All Books" << endl;
+        cout << "4. Buy Book" << endl;
+        cout << "5. Exit" << endl;
+        cout << "Enter choice: ";
+        cin >> choice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        switch (choice) {
+            case 1: store.addBook(); break;
+            case 2: store.searchAndDisplayBook(); break;
+            case 3: store.displayAllBooks(); break;
+            case 4: store.buyBook(); break;
+            case 5: cout << "Exiting..." << endl; break;
+            default: cout << "Invalid choice. Please try again." << endl;
+        }
+    } while (choice != 5);
+    return 0;
+}
